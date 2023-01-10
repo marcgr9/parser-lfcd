@@ -9,15 +9,14 @@ fun readPIF(filename: String): MutableList<String> {
         val reader = BufferedReader(FileReader(filename))
         var line = reader.readLine()
         while (line != null) {
-            val tokenAndPosition = Arrays.asList(*line.split(" ".toRegex()).dropLastWhile { it.isEmpty() }
-                .toTypedArray())
+            val tokenAndPosition =
+                listOf(*line.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray())
             if (tokenAndPosition[3] != "-1") {
                 if (tokenAndPosition[0].contains("\"") || tokenAndPosition[0].contains("'") || !Pattern.matches(
-                        "[a-zA-Z]+",
-                        tokenAndPosition[0]
+                        "[a-zA-Z]+", tokenAndPosition[0]
                     )
                 ) tokens.add("constant") else tokens.add("identifier")
-            } else tokens.add(tokenAndPosition[0].strip())
+            } else tokens.add(tokenAndPosition[0].trim())
             line = reader.readLine()
         }
         reader.close()
@@ -33,8 +32,7 @@ fun readText(filename: String): List<String> {
         val reader = BufferedReader(FileReader(filename))
         var line = reader.readLine()
         while (line != null) {
-            val symbols = java.util.List.of(*line.split(" ".toRegex()).dropLastWhile { it.isEmpty() }
-                .toTypedArray())
+            val symbols = java.util.List.of(*line.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray())
             sequence.addAll(symbols)
             line = reader.readLine()
         }
@@ -91,3 +89,4 @@ fun menu(): String
         7. From sequence
         8. From PIF
     """.trimIndent()
+
