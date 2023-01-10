@@ -166,7 +166,6 @@ class Parser(
                 productionsRhs.add(mutableListOf(epsilon, nonterminal))
             }
         }
-        println(productionsRhs)
         productions.forEach { (k, v) ->
             val key = k.iterator().next()
             for (production in v) {

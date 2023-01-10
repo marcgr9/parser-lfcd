@@ -43,7 +43,7 @@ fun readText(filename: String): List<String> {
 }
 
 fun main() {
-    val grammar = Grammar("src/main/resources/g1.txt")
+    val grammar = Grammar("src/main/resources/g2.txt")
     val parser = Parser(grammar)
 
     val scanner = Scanner(System.`in`)
@@ -65,20 +65,19 @@ fun main() {
                 val sequence= readText("src/main/resources/seq.txt")
                 val parserOutput = ParserOutput(parser, sequence, "src/main/resources/out1.txt")
                 println(parser.parseSequence(sequence))
-                println(parserOutput.printTree())
+                parserOutput.printTree()
             }
             8 -> {
                 val sequence = readPIF("src/main/resources/PIF.txt")
-                val parserOutput = ParserOutput(parser, sequence, "src/main/resources/out1.txt")
+                val parserOutput = ParserOutput(parser, sequence, "src/main/resources/out2.txt")
                 println(parser.parseSequence(sequence))
-                println(parserOutput.printTree())
+                parserOutput.printTree()
             }
         }
     }
 }
 
-fun menu(): String
-        = """
+fun menu(): String = """
         0. Menu
         1. Non terminals
         2. Terminals
@@ -86,7 +85,7 @@ fun menu(): String
         4. Production for terminal
         5. First
         6. Follow
-        7. From sequence
-        8. From PIF
+        7. From sequence (must use g1)
+        8. From PIF (must use g2)
     """.trimIndent()
 

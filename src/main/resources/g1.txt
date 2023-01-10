@@ -4,6 +4,6 @@ S = S
 P = {
     S -> A B
     A -> ( S ) | int C
-    B -> + S | epsilon
-    C -> * A | epsilon
+    B -> + S | ε
+    C -> * A | ε
 }

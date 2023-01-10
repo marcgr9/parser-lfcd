@@ -3,22 +3,22 @@ E = { ; int float long unsigned char string = + - * / % read print ( ) { } " ' =
 S = program
 P = {
     program -> declaration_list statements
-    declaration_list -> declaration declaration_list | epsilon
+    declaration_list -> declaration declaration_list | ε
     declaration -> var_type identifier equal_expression ;
-    equal_expression -> = expression | epsilon
+    equal_expression -> = expression | ε
     var_type -> int | float | long | unsigned | char | string
     expression -> term sign_and_expression
-    sign_and_expression -> sign expression | epsilon
+    sign_and_expression -> sign expression | ε
     sign -> + | - | * | / | %
     term -> identifier | constant
-    statements -> statement statements | epsilon
+    statements -> statement statements | ε
     statement -> simple_stmt | struct_stmt
     simple_stmt -> assignment_stmt | input_output_stmt
     struct_stmt -> if_stmt | while_stmt
     assignment_stmt -> identifier = expression ;
     input_output_stmt -> read ( term ) ; | print ( term ) ;
     if_stmt -> if ( condition ) { statements } else_stmt
-    else_stmt -> else { statements } | epsilon
+    else_stmt -> else { statements } | ε
     while_stmt -> while ( condition ) { statements }
     condition -> expression relation expression
     relation -> == | != | < | > | <= | >=
