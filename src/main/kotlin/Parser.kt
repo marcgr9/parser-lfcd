@@ -17,12 +17,13 @@ class Parser(
     }
 
     private fun generateFirst() {
-        grammar.n.forEach { nonterminal ->
+        grammar.nonTerminals.forEach { nonterminal ->
             firstSet[nonterminal] = mutableSetOf()
             val productionForNonterminal = grammar.getProductionForNonterminal(nonterminal)
             productionForNonterminal.forEach { production ->
-                if (grammar.e.contains(production[0]) || production[0] == epsilon)
-                    firstSet[nonterminal]!!.add(production[0])
+                if (grammar.terminals.contains(production[0]) || production[0] == epsilon) firstSet[nonterminal]!!.add(
+                    production[0]
+                )
             }
         }
 
@@ -31,15 +32,16 @@ class Parser(
             isChanged = false
 
             val newColumn = mutableMapOf<String, Set<String>>()
-            grammar.n.forEach { nonterminal ->
+            grammar.nonTerminals.forEach { nonterminal ->
                 val productionForNonterminal = grammar.getProductionForNonterminal(nonterminal)
-                val toAdd: MutableSet<String> = mutableSetOf<String>().apply { addAll(firstSet[nonterminal] ?: listOf())}
+                val toAdd: MutableSet<String> =
+                    mutableSetOf<String>().apply { addAll(firstSet[nonterminal] ?: listOf()) }
                 productionForNonterminal.forEach { production ->
                     val rhsNonTerminals = mutableListOf<String>()
 
                     var rhsTerminal: String? = null
                     for (symbol in production) {
-                        if (grammar.n.contains(symbol)) rhsNonTerminals.add(symbol)
+                        if (grammar.nonTerminals.contains(symbol)) rhsNonTerminals.add(symbol)
                         else {
                             rhsTerminal = symbol
                             break
@@ -87,26 +89,26 @@ class Parser(
 
     private fun generateFollow() {
         //initialization
-        for (nonterminal in grammar.n) {
+        for (nonterminal in grammar.nonTerminals) {
             followSet[nonterminal] = mutableSetOf()
         }
-        followSet[grammar.s]!!.add(epsilon)
+        followSet[grammar.startingSymbol]!!.add(epsilon)
 
         //rest of iterations
         var isChanged = true
         while (isChanged) {
             isChanged = false
             val newColumn = HashMap<String, Set<String>>()
-            grammar.n.forEach { nonterminal ->
+            grammar.nonTerminals.forEach { nonterminal ->
                 newColumn[nonterminal] = HashSet()
                 val productionsWithNonterminalInRhs = mutableMapOf<String, MutableSet<List<String>>>()
-                val allProductions = grammar.p
+                val allProductions = grammar.productions
                 allProductions.forEach { (k, v) ->
                     for (eachProduction in v) {
                         if (eachProduction.contains(nonterminal)) {
                             val key = k.iterator().next()
-                            if (!productionsWithNonterminalInRhs.containsKey(key))
-                                productionsWithNonterminalInRhs[key] = mutableSetOf()
+                            if (!productionsWithNonterminalInRhs.containsKey(key)) productionsWithNonterminalInRhs[key] =
+                                mutableSetOf()
 
                             productionsWithNonterminalInRhs[key]!!.add(eachProduction)
                         }
@@ -123,7 +125,7 @@ class Parser(
                                     toAdd.addAll(followSet[k]!!)
                                 } else {
                                     val followSymbol = production[indexOfNonterminal + 1]
-                                    if (grammar.e.contains(followSymbol)) toAdd.add(followSymbol)
+                                    if (grammar.terminals.contains(followSymbol)) toAdd.add(followSymbol)
                                     else {
                                         for (symbol in firstSet[followSymbol]!!) {
                                             if (symbol == epsilon) toAdd.addAll(followSet[k]!!) else toAdd.addAll(
@@ -147,16 +149,16 @@ class Parser(
 
     private fun generateParseTable() {
         val rows: MutableList<String> = ArrayList()
-        rows.addAll(grammar.n)
-        rows.addAll(grammar.e)
+        rows.addAll(grammar.nonTerminals)
+        rows.addAll(grammar.terminals)
         rows.add("$")
         val columns: MutableList<String> = ArrayList()
-        columns.addAll(grammar.e)
+        columns.addAll(grammar.terminals)
         columns.add("$")
         for (row in rows) for (col in columns) parseTable[Pair(row, col)] = Pair("error", -1)
         for (col in columns) parseTable[Pair(col, col)] = Pair("pop", -1)
         parseTable[Pair("$", "$")] = Pair("accept", -1)
-        val productions = grammar.p
+        val productions = grammar.productions
         productionsRhs.clear()
         productions.forEach { (k, v) ->
             val nonterminal = k.iterator().next()
@@ -169,7 +171,7 @@ class Parser(
             val key = k.iterator().next()
             for (production in v) {
                 val firstSymbol = production[0]
-                if (grammar.e.contains(firstSymbol)) {
+                if (grammar.terminals.contains(firstSymbol)) {
                     if (parseTable[Pair(key, firstSymbol)]!!.first == "error") {
                         parseTable[Pair(key, firstSymbol)] =
                             Pair(java.lang.String.join(" ", production), productionsRhs.indexOf(production) + 1)
@@ -180,12 +182,11 @@ class Parser(
                             e.printStackTrace()
                         }
                     }
-                } else if (grammar.n.contains(firstSymbol)) {
+                } else if (grammar.nonTerminals.contains(firstSymbol)) {
                     if (production.size == 1) {
                         for (symbol: String in firstSet.get(firstSymbol)!!) {
-                            if (parseTable[Pair(key, symbol)]!!.first == "error")
-                                parseTable[Pair(key, symbol)] =
-                                    Pair(java.lang.String.join(" ", production), productionsRhs.indexOf(production) + 1)
+                            if (parseTable[Pair(key, symbol)]!!.first == "error") parseTable[Pair(key, symbol)] =
+                                Pair(java.lang.String.join(" ", production), productionsRhs.indexOf(production) + 1)
                             else {
                                 try {
                                     throw IllegalAccessException("conflict in pair:  $key,$symbol")
@@ -195,10 +196,10 @@ class Parser(
                             }
                         }
                     } else {
-                        var i: Int = 1
+                        var i = 1
                         var nextSymbol = production.get(1)
                         val firstSetForProduction: MutableSet<String>? = firstSet.get(firstSymbol)
-                        while (i < production.size && grammar.n.contains(nextSymbol)) {
+                        while (i < production.size && grammar.nonTerminals.contains(nextSymbol)) {
                             val firstForNext: Set<String>? = firstSet.get(nextSymbol)
                             if (firstSetForProduction!!.contains(epsilon)) {
                                 firstSetForProduction.remove(epsilon)
@@ -209,12 +210,9 @@ class Parser(
                         }
                         for (symb in firstSetForProduction!!) {
                             val symbol = if (symb == epsilon) "$" else symb
-                            if (parseTable[Pair(key, symbol)]!!.first == "error")
-                                parseTable[Pair(key, symbol)] =
-                                    Pair(
-                                        production.joinToString(separator = " "),
-                                        productionsRhs.indexOf(production) + 1
-                                    )
+                            if (parseTable[Pair(key, symbol)]!!.first == "error") parseTable[Pair(key, symbol)] = Pair(
+                                production.joinToString(separator = " "), productionsRhs.indexOf(production) + 1
+                            )
                             else {
                                 try {
                                     throw IllegalAccessException("conflict in pair:  $key,$symbol")
@@ -239,8 +237,7 @@ class Parser(
                                 }
                             }
                         } else if (parseTable[Pair(key, symbol)]!!.first == "error") {
-                            val prod: ArrayList<String> =
-                                ArrayList(listOf(epsilon, key))
+                            val prod: ArrayList<String> = ArrayList(listOf(epsilon, key))
                             parseTable[Pair(key, symbol)] = Pair(epsilon, productionsRhs.indexOf(prod) + 1)
                         } else {
                             try {
@@ -295,7 +292,7 @@ class Parser(
         alpha.push("$")
         for (i in sequence.indices.reversed()) alpha.push(sequence[i])
         beta.push("$")
-        beta.push(grammar.s)
+        beta.push(grammar.startingSymbol)
         while (!(alpha.peek() == "$" && beta.peek() == "$")) {
             val alphaPeek = alpha.peek()
             val betaPeek = beta.peek()

@@ -9,15 +9,14 @@ fun readPIF(filename: String): MutableList<String> {
         val reader = BufferedReader(FileReader(filename))
         var line = reader.readLine()
         while (line != null) {
-            val tokenAndPosition = Arrays.asList(*line.split(" ".toRegex()).dropLastWhile { it.isEmpty() }
-                .toTypedArray())
+            val tokenAndPosition =
+                listOf(*line.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray())
             if (tokenAndPosition[3] != "-1") {
                 if (tokenAndPosition[0].contains("\"") || tokenAndPosition[0].contains("'") || !Pattern.matches(
-                        "[a-zA-Z]+",
-                        tokenAndPosition[0]
+                        "[a-zA-Z]+", tokenAndPosition[0]
                     )
                 ) tokens.add("constant") else tokens.add("identifier")
-            } else tokens.add(tokenAndPosition[0].strip())
+            } else tokens.add(tokenAndPosition[0].trim())
             line = reader.readLine()
         }
         reader.close()
@@ -33,8 +32,7 @@ fun readText(filename: String): List<String> {
         val reader = BufferedReader(FileReader(filename))
         var line = reader.readLine()
         while (line != null) {
-            val symbols = java.util.List.of(*line.split(" ".toRegex()).dropLastWhile { it.isEmpty() }
-                .toTypedArray())
+            val symbols = java.util.List.of(*line.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray())
             sequence.addAll(symbols)
             line = reader.readLine()
         }
@@ -47,35 +45,35 @@ fun readText(filename: String): List<String> {
 fun main() {
     val grammar = Grammar("src/main/resources/g2.txt")
 
-//        System.out.println(grammar.printNonTerminals());
-//        System.out.println(grammar.printTerminals());
-//        System.out.println(grammar.printProductions());
-//        System.out.println(grammar.printProductionsForNonTerminal("if_stmt"));
-//        System.out.println(grammar.printProductionsForNonTerminal("declaration"));
-//        System.out.println(grammar.getProductionForNonterminal("declaration"));
-//        System.out.println(grammar.checkIfCFG());
+//        println(grammar.printNonTerminals());
+//        println(grammar.printTerminals());
+//        println(grammar.printProductions());
+//        println(grammar.printProductionsForNonTerminal("if_stmt"));
+//        println(grammar.printProductionsForNonTerminal("declaration"));
+//        println(grammar.getProductionForNonterminal("declaration"));
+//        println(grammar.checkIfCFG());
 
 
-//        System.out.println(grammar.printNonTerminals());
-//        System.out.println(grammar.printTerminals());
-//        System.out.println(grammar.printProductions());
-//        System.out.println(grammar.printProductionsForNonTerminal("if_stmt"));
-//        System.out.println(grammar.printProductionsForNonTerminal("declaration"));
-//        System.out.println(grammar.getProductionForNonterminal("declaration"));
-//        System.out.println(grammar.checkIfCFG());
+//        println(grammar.printNonTerminals());
+//        println(grammar.printTerminals());
+//        println(grammar.printProductions());
+//        println(grammar.printProductionsForNonTerminal("if_stmt"));
+//        println(grammar.printProductionsForNonTerminal("declaration"));
+//        println(grammar.getProductionForNonterminal("declaration"));
+//        println(grammar.checkIfCFG());
     val parser = Parser(grammar)
-    System.out.println(parser.printFirst())
-    System.out.println(parser.printFollow())
-    System.out.println(parser.printParseTable())
+    println(parser.printFirst())
+    println(parser.printFollow())
+    println(parser.printParseTable())
 //        List<String> sequence = List.of("(","int",")","+","int");
     //        List<String> sequence = List.of("(","int",")","+","int");
 //    val sequence: List<String> = readText("src/main/resources/seq.txt")
-        val sequence = readPIF("src/main/resources/PIF.txt");
+    val sequence = readPIF("src/main/resources/PIF.txt");
     //        List<String> sequence = readPIF("src/ubb/flcd/Resources/PIF.txt");
-    System.out.println(parser.parseSequence(sequence))
-//        System.out.println(parser.getProductionsRhs());
+    println(parser.parseSequence(sequence))
+//        println(parser.getProductionsRhs());
 
-    //        System.out.println(parser.getProductionsRhs());
+    //        println(parser.getProductionsRhs());
     val parserOutput = ParserOutput(parser, sequence, "src/main/resources/out1.txt")
     parserOutput.printTree()
 }

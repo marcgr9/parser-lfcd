@@ -3,12 +3,12 @@ import java.io.FileReader
 import java.util.*
 
 class Grammar(filename: String) {
-    var n: Set<String> = HashSet()
+    var nonTerminals: Set<String> = HashSet()
         private set
-    var e: Set<String> = HashSet()
+    var terminals: Set<String> = HashSet()
         private set
-    val p = HashMap<Set<String>, MutableSet<MutableList<String>>>()
-    var s = ""
+    val productions = HashMap<Set<String>, MutableSet<MutableList<String>>>()
+    var startingSymbol = ""
         private set
 
     init {
@@ -19,45 +19,42 @@ class Grammar(filename: String) {
         try {
             val reader = BufferedReader(FileReader(filename))
             var input = reader.readLine()
-            val NlineSplit = input.split("=".toRegex(), input.indexOf("=").coerceAtLeast(0)).toTypedArray()
-            var Nline = StringBuilder()
-            for (i in 1 until NlineSplit.size) Nline.append(NlineSplit[i])
-            var builder = StringBuilder(Nline.toString())
-            builder.deleteCharAt(1).deleteCharAt(Nline.length - 2)
-            Nline = StringBuilder(builder.toString())
-            n = HashSet(Arrays.asList(*Nline.toString().strip().split(" ".toRegex()).dropLastWhile { it.isEmpty() }
+            val nonTerminalsLineSplit = input.split("=".toRegex(), input.indexOf("=").coerceAtLeast(0)).toTypedArray()
+            var nonTerminals = StringBuilder()
+            for (i in 1 until nonTerminalsLineSplit.size) nonTerminals.append(nonTerminalsLineSplit[i])
+            var builder = StringBuilder(nonTerminals.toString())
+            builder.deleteCharAt(1).deleteCharAt(nonTerminals.length - 2)
+            nonTerminals = StringBuilder(builder.toString())
+            this.nonTerminals = HashSet(listOf(*nonTerminals.toString().trim().split(" ".toRegex()).dropLastWhile { it.isEmpty() }
                 .toTypedArray()))
             input = reader.readLine()
-            val ElineSplit = input.split("=".toRegex(), input.indexOf("=").coerceAtLeast(0)).toTypedArray()
-            var Eline = StringBuilder()
-            for (i in 1 until ElineSplit.size) Eline.append(ElineSplit[i])
-            builder = StringBuilder(Eline.toString())
-            builder.deleteCharAt(1).deleteCharAt(Eline.length - 2)
-            Eline = StringBuilder(builder.toString())
-            e = HashSet(Arrays.asList(*Eline.toString().strip().split(" ".toRegex()).dropLastWhile { it.isEmpty() }
+            val terminalsLineSplit = input.split("=".toRegex(), input.indexOf("=").coerceAtLeast(0)).toTypedArray()
+            var terminals = StringBuilder()
+            for (i in 1 until terminalsLineSplit.size) terminals.append(terminalsLineSplit[i])
+            builder = StringBuilder(terminals.toString())
+            builder.deleteCharAt(1).deleteCharAt(terminals.length - 2)
+            terminals = StringBuilder(builder.toString())
+            this.terminals = HashSet(listOf(*terminals.toString().trim().split(" ".toRegex()).dropLastWhile { it.isEmpty() }
                 .toTypedArray()))
-            s = reader.readLine().split("=".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[1].strip()
+            startingSymbol = reader.readLine().split("=".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[1].trim()
 
             // first and last lines for productions will not contain any relevant information, we only need to check starting from the second until the second-last
             reader.readLine()
             var line = reader.readLine()
             while (line != null) {
                 if (line != "}") {
-                    val tokens = line.split("->".toRegex()).dropLastWhile { it.isEmpty() }
-                        .toTypedArray()
-                    val lhsTokens = tokens[0].split(",".toRegex()).dropLastWhile { it.isEmpty() }
-                        .toTypedArray()
-                    val rhsTokens = tokens[1].split("\\|".toRegex()).dropLastWhile { it.isEmpty() }
-                        .toTypedArray()
+                    val tokens = line.split("->".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                    val lhsTokens = tokens[0].split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                    val rhsTokens = tokens[1].split("\\|".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
                     val lhs: MutableSet<String> = HashSet()
-                    for (l in lhsTokens) lhs.add(l.strip())
-                    if (!p.containsKey(lhs)) p[lhs] = HashSet()
+                    for (l in lhsTokens) lhs.add(l.trim())
+                    if (!productions.containsKey(lhs)) productions[lhs] = HashSet()
                     for (rhsT in rhsTokens) {
                         val productionElements = ArrayList<String>()
-                        val rhsTokenElement = rhsT.strip().split(" ".toRegex()).dropLastWhile { it.isEmpty() }
-                            .toTypedArray()
-                        for (r in rhsTokenElement) productionElements.add(r.strip())
-                        p[lhs]!!.add(productionElements)
+                        val rhsTokenElement =
+                            rhsT.trim().split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                        for (r in rhsTokenElement) productionElements.add(r.trim())
+                        productions[lhs]!!.add(productionElements)
                     }
                 }
                 line = reader.readLine()
@@ -69,21 +66,21 @@ class Grammar(filename: String) {
 
     fun printNonTerminals(): String {
         val sb = StringBuilder("N = { ")
-        for (n in n) sb.append(n).append(" ")
+        for (n in nonTerminals) sb.append(n).append(" ")
         sb.append("}")
         return sb.toString()
     }
 
     fun printTerminals(): String {
         val sb = StringBuilder("E = { ")
-        for (e in e) sb.append(e).append(" ")
+        for (e in terminals) sb.append(e).append(" ")
         sb.append("}")
         return sb.toString()
     }
 
     fun printProductions(): String {
         val sb = StringBuilder("P = { \n")
-        p.forEach { (lhs: Set<String>, rhs: Set<List<String>>) ->
+        productions.forEach { (lhs: Set<String>, rhs: Set<List<String>>) ->
             sb.append("\t")
             var count = 0
             for (lh in lhs) {
@@ -108,10 +105,10 @@ class Grammar(filename: String) {
 
     fun printProductionsForNonTerminal(nonTerminal: String): String {
         val sb = StringBuilder()
-        for (lhs in p.keys) {
+        for (lhs in productions.keys) {
             if (lhs.contains(nonTerminal)) {
                 sb.append(nonTerminal).append(" -> ")
-                val rhs: Set<List<String>> = p[lhs]!!
+                val rhs: Set<List<String>> = productions[lhs]!!
                 var count = 0
                 for (rh in rhs) {
                     for (r in rh) {
@@ -127,17 +124,17 @@ class Grammar(filename: String) {
 
     fun checkIfCFG(): Boolean {
         var checkStartingSymbol = false
-        for (lhs in p.keys) if (lhs.contains(s)) {
+        for (lhs in productions.keys) if (lhs.contains(startingSymbol)) {
             checkStartingSymbol = true
             break
         }
         if (!checkStartingSymbol) return false
-        for (lhs in p.keys) {
-            if (lhs.size > 1) return false else if (!n.contains(lhs.iterator().next())) return false
-            val rhs: Set<List<String>> = p[lhs]!!
+        for (lhs in productions.keys) {
+            if (lhs.size > 1) return false else if (!nonTerminals.contains(lhs.iterator().next())) return false
+            val rhs: Set<List<String>> = productions[lhs]!!
             for (rh in rhs) {
                 for (r in rh) {
-                    if (!(n.contains(r) || e.contains(r) || r == "epsilon")) return false
+                    if (!(nonTerminals.contains(r) || terminals.contains(r) || r == "epsilon")) return false
                 }
             }
         }
@@ -145,9 +142,9 @@ class Grammar(filename: String) {
     }
 
     fun getProductionForNonterminal(nonTerminal: String): Set<List<String>> {
-        for (lhs in p.keys) {
+        for (lhs in productions.keys) {
             if (lhs.contains(nonTerminal)) {
-                return p[lhs]!!
+                return productions[lhs]!!
             }
         }
         return HashSet()

@@ -31,15 +31,13 @@ class ParserOutput(private val parser: Parser, sequence: List<String>, outputFil
         node.hasRight = false
         node.index = nodeNumber
         nodeNumber++
-        node.value = parser.grammar.s
+        node.value = parser.grammar.startingSymbol
         nodeStack.push(node)
         nodeList.add(node)
         root = node
         while (productionsIndex < productions.size && !nodeStack.isEmpty()) {
             val currentNode = nodeStack.peek() //father
-            if (parser.grammar.e.contains(currentNode.value) || currentNode.value
-                    .contains("epsilon")
-            ) {
+            if (parser.grammar.terminals.contains(currentNode.value) || currentNode.value.contains("epsilon")) {
                 while (nodeStack.size > 0 && !nodeStack.peek().hasRight) {
                     nodeStack.pop()
                 }
@@ -83,7 +81,7 @@ class ParserOutput(private val parser: Parser, sequence: List<String>, outputFil
                 """.trimIndent()
             )
             for (node in nodeList) {
-                bufferedWriter.write((((node.index.toString() + " | " + node.value).toString() + " | " + node.parent) + " | " + node.sibling) + "\n")
+                bufferedWriter.write((((node.index.toString() + " | " + node.value) + " | " + node.parent) + " | " + node.sibling) + "\n")
             }
             bufferedWriter.close()
         } catch (e: Exception) {
