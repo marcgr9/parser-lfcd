@@ -55,19 +55,20 @@ fun main() {
             1 -> println(grammar.nonTerminals)
             2 -> println(grammar.terminals)
             3 -> println(grammar.productions)
-            4 -> {
+            4 -> println(grammar.checkIfCFG())
+            5 -> {
                 print("Nonterminal: ")
                 println(grammar.printProductionsForNonTerminal(scanner.next()))
             }
-            5 -> println(parser.printFirst())
-            6 -> println(parser.printFollow())
-            7 -> {
+            6 -> println(parser.printFirst())
+            7 -> println(parser.printFollow())
+            8 -> {
                 val sequence= readText("src/main/resources/seq.txt")
                 val parserOutput = ParserOutput(parser, sequence, "src/main/resources/out1.txt")
                 println(parser.parseSequence(sequence))
                 parserOutput.printTree()
             }
-            8 -> {
+            9 -> {
                 val sequence = readPIF("src/main/resources/PIF.txt")
                 val parserOutput = ParserOutput(parser, sequence, "src/main/resources/out2.txt")
                 println(parser.parseSequence(sequence))
@@ -82,10 +83,11 @@ fun menu(): String = """
         1. Non terminals
         2. Terminals
         3. Productions
-        4. Production for terminal
-        5. First
-        6. Follow
-        7. From sequence (must use g1)
-        8. From PIF (must use g2)
+        4. Check if CFG
+        5. Production for terminal
+        6. First
+        7. Follow
+        8. From sequence (must use g1)
+        9. From PIF (must use g2)
     """.trimIndent()
 

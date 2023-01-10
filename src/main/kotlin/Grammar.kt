@@ -64,45 +64,6 @@ class Grammar(filename: String) {
         }
     }
 
-    fun printNonTerminals(): String {
-        val sb = StringBuilder("N = { ")
-        for (n in nonTerminals) sb.append(n).append(" ")
-        sb.append("}")
-        return sb.toString()
-    }
-
-    fun printTerminals(): String {
-        val sb = StringBuilder("E = { ")
-        for (e in terminals) sb.append(e).append(" ")
-        sb.append("}")
-        return sb.toString()
-    }
-
-    fun printProductions(): String {
-        val sb = StringBuilder("P = { \n")
-        productions.forEach { (lhs: Set<String>, rhs: Set<List<String>>) ->
-            sb.append("\t")
-            var count = 0
-            for (lh in lhs) {
-                sb.append(lh)
-                count++
-                if (count < lhs.size) sb.append(", ")
-            }
-            sb.append(" -> ")
-            count = 0
-            for (rh in rhs) {
-                for (r in rh) {
-                    sb.append(r).append(" ")
-                }
-                count++
-                if (count < rhs.size) sb.append("| ")
-            }
-            sb.append("\n")
-        }
-        sb.append("}")
-        return sb.toString()
-    }
-
     fun printProductionsForNonTerminal(nonTerminal: String): String {
         val sb = StringBuilder()
         for (lhs in productions.keys) {
@@ -134,7 +95,7 @@ class Grammar(filename: String) {
             val rhs: Set<List<String>> = productions[lhs]!!
             for (rh in rhs) {
                 for (r in rh) {
-                    if (!(nonTerminals.contains(r) || terminals.contains(r) || r == "epsilon")) return false
+                    if (!(nonTerminals.contains(r) || terminals.contains(r) || r == Parser.epsilon)) return false
                 }
             }
         }

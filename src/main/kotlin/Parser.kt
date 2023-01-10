@@ -8,7 +8,9 @@ class Parser(
     private var productionsRhs: MutableList<MutableList<String>> = mutableListOf(),
 ) {
 
-    val epsilon = "ε"
+    companion object {
+        const val epsilon = "ε"
+    }
 
     init {
         generateFirst()
@@ -183,9 +185,9 @@ class Parser(
                     }
                 } else if (grammar.nonTerminals.contains(firstSymbol)) {
                     if (production.size == 1) {
-                        for (symbol: String in firstSet.get(firstSymbol)!!) {
-                            if (parseTable[Pair(key, symbol)]!!.first == "error") parseTable[Pair(key, symbol)] =
-                                Pair(java.lang.String.join(" ", production), productionsRhs.indexOf(production) + 1)
+                        for (symbol: String in firstSet[firstSymbol]!!) {
+                            if (parseTable[Pair(key, symbol)]!!.first == "error")
+                                parseTable[Pair(key, symbol)] = Pair(java.lang.String.join(" ", production), productionsRhs.indexOf(production) + 1)
                             else {
                                 try {
                                     throw IllegalAccessException("conflict in pair:  $key,$symbol")
@@ -196,16 +198,16 @@ class Parser(
                         }
                     } else {
                         var i = 1
-                        var nextSymbol = production.get(1)
-                        val firstSetForProduction: MutableSet<String>? = firstSet.get(firstSymbol)
+                        var nextSymbol = production[1]
+                        val firstSetForProduction: MutableSet<String>? = firstSet[firstSymbol]
                         while (i < production.size && grammar.nonTerminals.contains(nextSymbol)) {
-                            val firstForNext: Set<String>? = firstSet.get(nextSymbol)
+                            val firstForNext: Set<String>? = firstSet[nextSymbol]
                             if (firstSetForProduction!!.contains(epsilon)) {
                                 firstSetForProduction.remove(epsilon)
                                 firstSetForProduction.addAll((firstForNext)!!)
                             }
                             i++
-                            if (i < production.size) nextSymbol = production.get(i)
+                            if (i < production.size) nextSymbol = production[i]
                         }
                         for (symb in firstSetForProduction!!) {
                             val symbol = if (symb == epsilon) "$" else symb

@@ -37,7 +37,7 @@ class ParserOutput(private val parser: Parser, sequence: List<String>, outputFil
         root = node
         while (productionsIndex < productions.size && !nodeStack.isEmpty()) {
             val currentNode = nodeStack.peek() //father
-            if (parser.grammar.terminals.contains(currentNode.value) || currentNode.value.contains("epsilon")) {
+            if (parser.grammar.terminals.contains(currentNode.value) || currentNode.value.contains(Parser.epsilon)) {
                 while (nodeStack.size > 0 && !nodeStack.peek().hasRight) {
                     nodeStack.pop()
                 }
