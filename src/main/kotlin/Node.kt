@@ -1,9 +1,9 @@
 class Node() {
 
-    var parent: Int = -1
+    var parent: Int? = null
     var value: String = ""
-    var index: Int = -1
-    var sibling: Int = -1
+    var index: Int? = null
+    var sibling: Int? = null
     var hasRight: Boolean = false
 
 }

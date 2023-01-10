@@ -45,37 +45,49 @@ fun readText(filename: String): List<String> {
 }
 
 fun main() {
-    val grammar = Grammar("src/main/resources/g2.txt")
-
-//        System.out.println(grammar.printNonTerminals());
-//        System.out.println(grammar.printTerminals());
-//        System.out.println(grammar.printProductions());
-//        System.out.println(grammar.printProductionsForNonTerminal("if_stmt"));
-//        System.out.println(grammar.printProductionsForNonTerminal("declaration"));
-//        System.out.println(grammar.getProductionForNonterminal("declaration"));
-//        System.out.println(grammar.checkIfCFG());
-
-
-//        System.out.println(grammar.printNonTerminals());
-//        System.out.println(grammar.printTerminals());
-//        System.out.println(grammar.printProductions());
-//        System.out.println(grammar.printProductionsForNonTerminal("if_stmt"));
-//        System.out.println(grammar.printProductionsForNonTerminal("declaration"));
-//        System.out.println(grammar.getProductionForNonterminal("declaration"));
-//        System.out.println(grammar.checkIfCFG());
+    val grammar = Grammar("src/main/resources/g1.txt")
     val parser = Parser(grammar)
-    System.out.println(parser.printFirst())
-    System.out.println(parser.printFollow())
-    System.out.println(parser.printParseTable())
-//        List<String> sequence = List.of("(","int",")","+","int");
-    //        List<String> sequence = List.of("(","int",")","+","int");
-//    val sequence: List<String> = readText("src/main/resources/seq.txt")
-        val sequence = readPIF("src/main/resources/PIF.txt");
-    //        List<String> sequence = readPIF("src/ubb/flcd/Resources/PIF.txt");
-    System.out.println(parser.parseSequence(sequence))
-//        System.out.println(parser.getProductionsRhs());
 
-    //        System.out.println(parser.getProductionsRhs());
-    val parserOutput = ParserOutput(parser, sequence, "src/main/resources/out1.txt")
-    parserOutput.printTree()
+    val scanner = Scanner(System.`in`)
+
+    println(menu())
+    while (true) {
+        when (scanner.nextInt()) {
+            0 -> println(menu())
+            1 -> println(grammar.nonTerminals)
+            2 -> println(grammar.terminals)
+            3 -> println(grammar.productions)
+            4 -> {
+                print("Nonterminal: ")
+                println(grammar.printProductionsForNonTerminal(scanner.next()))
+            }
+            5 -> println(parser.printFirst())
+            6 -> println(parser.printFollow())
+            7 -> {
+                val sequence= readText("src/main/resources/seq.txt")
+                val parserOutput = ParserOutput(parser, sequence, "src/main/resources/out1.txt")
+                println(parser.parseSequence(sequence))
+                println(parserOutput.printTree())
+            }
+            8 -> {
+                val sequence = readPIF("src/main/resources/PIF.txt")
+                val parserOutput = ParserOutput(parser, sequence, "src/main/resources/out1.txt")
+                println(parser.parseSequence(sequence))
+                println(parserOutput.printTree())
+            }
+        }
+    }
 }
+
+fun menu(): String
+        = """
+        0. Menu
+        1. Non terminals
+        2. Terminals
+        3. Productions
+        4. Production for terminal
+        5. First
+        6. Follow
+        7. From sequence
+        8. From PIF
+    """.trimIndent()
